@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VR Club Бирск - Онлайн бронирование</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .booking-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .time-slot {
+            padding: 1rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .time-slot:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .time-slot.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .time-slot.unavailable {
+            background: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .duration-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .duration-option {
+            padding: 1.5rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .duration-option:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .duration-option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .duration-option .price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #28a745;
+            margin-top: 0.5rem;
+        }
+
+        .duration-option.selected .price {
+            color: white;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .admin-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+
+        .admin-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .bookings-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .booking-item {
+            padding: 1rem;
+            border: 1px solid #e1e5e9;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .booking-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .booking-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="#" class="logo">VR CLUB</a>
+            <ul class="nav-links">
+                <li><a href="#booking">Бронирование</a></li>
+                <li><a href="#about">О нас</a></li>
+                <li><a href="#contact">Контакты</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Добро пожаловать в VR Club</h1>
+            <p>г. Бирск, ул. Интернациональная, д. 22</p>
+            <p>Режим работы: 10:00 - 22:00</p>
+        </div>
+
+        <div class="card" id="booking">
+            <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">Онлайн бронирование</h2>
+            
+            <form class="booking-form" id="bookingForm">
+                <div>
+                    <div class="form-group">
+                        <label for="firstName">Имя *</label>
+                        <input type="text" id="firstName" name="firstName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lastName">Фамилия *</label>
+                        <input type="text" id="lastName" name="lastName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Номер телефона *</label>
+                        <input type="tel" id="phone" name="phone" placeholder="+7 (___) ___-__-__" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="date">Дата бронирования *</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="playerCount">Количество игроков *</label>
+                        <select id="playerCount" name="playerCount" required>
+                            <option value="">Выберите количество</option>
+                            <option value="1">1 игрок</option>
+                            <option value="2">2 игрока</option>
+                            <option value="3">3 игрока</option>
+                            <option value="4">4 игрока</option>
+                            <option value="5">5 игроков</option>
+                            <option value="6">6 игроков</option>
+                            <option value="7">7 игроков</option>
+                            <option value="8">8 игроков</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="form-group">
+                        <label>Выберите продолжительность</label>
+                        <div class="duration-options">
+                            <div class="duration-option" data-duration="30" data-price="390">
+                                <div>30 минут</div>
+                                <div class="price">390 ₽</div>
+                            </div>
+                            <div class="duration-option" data-duration="60" data-price="630">
+                                <div>1 час</div>
+                                <div class="price">630 ₽</div>
+                            </div>
+                            <div class="duration-option" data-duration="90" data-price="900">
+                                <div>1.5 часа</div>
+                                <div class="price">900 ₽</div>
+                            </div>
+                            <div class="duration-option" data-duration="120" data-price="1200">
+                                <div>2 часа</div>
+                                <div class="price">1200 ₽</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div class="form-group">
+                <label>Доступное время</label>
+                <div class="time-slots" id="timeSlots">
+                    <!-- Временные слоты будут генерироваться JavaScript -->
+                </div>
+            </div>
+
+            <button type="submit" class="btn" id="bookBtn" disabled>
+                Забронировать
+            </button>
+        </div>
+    </div>
+
+    <button class="admin-btn" onclick="openAdmin()" title="Админ панель">
+        👤
+    </button>
+
+    <!-- Admin Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAdmin()">&times;</span>
+            <h2>Вход администратора</h2>
+            <div class="form-group">
+                <label for="adminLogin">Логин</label>
+                <input type="text" id="adminLogin" placeholder="admin">
+            </div>
+            <div class="form-group">
+                <label for="adminPassword">Пароль</label>
+                <input type="password" id="adminPassword" placeholder="admin123">
+            </div>
+            <button class="btn" onclick="loginAdmin()">Войти</button>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div id="adminPanel" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <span class="close" onclick="closeAdminPanel()">&times;</span>
+            <h2>Панель администратора</h2>
+            
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                <div class="card" style="flex: 1; padding: 1rem;">
+                    <h3>Управление устройствами</h3>
+                    <div class="form-group">
+                        <label>Количество VR устройств</label>
+                        <input type="number" id="deviceCount" min="1" max="20" style="width: 100px;">
+                        <button class="btn btn-small" onclick="updateDeviceCount()" style="margin-left: 1rem;">Обновить</button>
+                    </div>
+                    <p>Текущее количество: <strong id="currentDevices">${vrDevices}</strong></p>
+                </div>
+                
+                <div class="card" style="flex: 1; padding: 1rem;">
+                    <h3>Статистика</h3>
+                    <p>Всего бронирований: <strong id="totalBookings">${bookings.length}</strong></p>
+                    <p>Доход сегодня: <strong id="todayRevenue">0 ₽</strong></p>
+                </div>
+            </div>
+            
+            <h3>Список бронирований</h3>
+            <div class="bookings-list" id="bookingsList">
+                <!-- Список бронирований -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedDuration = null;
+        let selectedPrice = null;
+        let selectedTime = null;
+        let vrDevices = 8; // Количество VR устройств
+        let bookings = [
+            {
+                id: 1,
+                firstName: 'Иван',
+                lastName: 'Петров',
+                phone: '+7 (912) 345-67-89',
+                date: '2025-05-24',
+                time: '14:00',
+                duration: 60,
+                price: 630,
+                prepaid: 315,
+                devicesUsed: 2
+            },
+            {
+                id: 2,
+                firstName: 'Анна',
+                lastName: 'Смирнова',
+                phone: '+7 (987) 654-32-10',
+                date: '2025-05-24',
+                time: '16:30',
+                duration: 90,
+                price: 900,
+                prepaid: 450,
+                devicesUsed: 4
+            }
+        ];
+
+        // Генерация временных слотов
+        function generateTimeSlots() {
+            const timeSlotsContainer = document.getElementById('timeSlots');
+            timeSlotsContainer.innerHTML = '';
+            
+            const startHour = 10;
+            const endHour = 22;
+            const selectedDate = document.getElementById('date').value;
+            const playerCount = parseInt(document.getElementById('playerCount').value) || 0;
+            
+            if (!selectedDate || !playerCount) return;
+
+            for (let hour = startHour; hour < endHour; hour++) {
+                for (let minute = 0; minute < 60; minute += 30) {
+                    const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                    const slot = document.createElement('div');
+                    slot.className = 'time-slot';
+                    slot.textContent = timeString;
+                    slot.onclick = () => selectTime(timeString, slot);
+                    
+                    // Проверяем доступность устройств
+                    const usedDevices = getUsedDevicesAtTime(selectedDate, timeString);
+                    const availableDevices = vrDevices - usedDevices;
+                    
+                    if (availableDevices < playerCount) {
+                        slot.classList.add('unavailable');
+                        slot.onclick = null;
+                        slot.title = `Недостаточно устройств (доступно: ${availableDevices})`;
+                    } else {
+                        slot.title = `Доступно устройств: ${availableDevices}`;
+                    }
+                    
+                    timeSlotsContainer.appendChild(slot);
+                }
+            }
+        }
+
+        // Получить количество занятых устройств в определенное время
+        function getUsedDevicesAtTime(date, time) {
+            return bookings
+                .filter(booking => booking.date === date && booking.time === time)
+                .reduce((sum, booking) => sum + booking.devicesUsed, 0);
+        }
+
+        // Выбор продолжительности
+        document.querySelectorAll('.duration-option').forEach(option => {
+            option.onclick = () => {
+                document.querySelectorAll('.duration-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedDuration = parseInt(option.dataset.duration);
+                selectedPrice = parseInt(option.dataset.price);
+                updateBookButton();
+            };
+        });
+
+        // Выбор времени
+        function selectTime(time, element) {
+            if (element.classList.contains('unavailable')) return;
+            
+            document.querySelectorAll('.time-slot').forEach(slot => slot.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedTime = time;
+            updateBookButton();
+        }
+
+        // Обновление состояния кнопки бронирования
+        function updateBookButton() {
+            const bookBtn = document.getElementById('bookBtn');
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const phone = document.getElementById('phone').value;
+            const date = document.getElementById('date').value;
+            const playerCount = document.getElementById('playerCount').value;
+            
+            if (firstName && lastName && phone && date && playerCount && selectedDuration && selectedTime) {
+                bookBtn.disabled = false;
+                const totalPrice = selectedPrice * parseInt(playerCount);
+                const prepayment = Math.ceil(totalPrice * 0.5);
+                bookBtn.textContent = `Забронировать (предоплата ${prepayment} ₽)`;
+            } else {
+                bookBtn.disabled = true;
+                bookBtn.textContent = 'Забронировать';
+            }
+        }
+
+        // Обработчики событий для полей формы
+        ['firstName', 'lastName', 'phone'].forEach(fieldId => {
+            document.getElementById(fieldId).oninput = updateBookButton;
+        });
+
+        document.getElementById('playerCount').onchange = () => {
+            generateTimeSlots();
+            updateBookButton();
+        };
+
+        document.getElementById('date').onchange = () => {
+            generateTimeSlots();
+            updateBookButton();
+        };
+
+        // Бронирование
+        document.getElementById('bookBtn').onclick = (e) => {
+            e.preventDefault();
+            
+            const playerCount = parseInt(document.getElementById('playerCount').value);
+            const totalPrice = selectedPrice * playerCount;
+            const prepayment = Math.ceil(totalPrice * 0.5);
+            
+            const booking = {
+                id: Date.now(),
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                phone: document.getElementById('phone').value,
+                date: document.getElementById('date').value,
+                time: selectedTime,
+                duration: selectedDuration,
+                price: totalPrice,
+                prepaid: prepayment,
+                devicesUsed: playerCount
+            };
+            
+            bookings.push(booking);
+            alert(`Бронирование создано!\nПредоплата: ${prepayment} ₽\nОплатить можно переводом или при посещении клуба.`);
+            
+            // Очистка формы
+            document.getElementById('bookingForm').reset();
+            selectedDuration = null;
+            selectedPrice = null;
+            selectedTime = null;
+            document.querySelectorAll('.duration-option, .time-slot').forEach(el => el.classList.remove('selected'));
+            generateTimeSlots();
+            updateBookButton();
+        };
+
+        // Админ панель
+        function openAdmin() {
+            document.getElementById('adminModal').style.display = 'block';
+        }
+
+        function closeAdmin() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        function loginAdmin() {
+            const login = document.getElementById('adminLogin').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            if (login === 'admin' && password === 'admin123') {
+                closeAdmin();
+                showAdminPanel();
+            } else {
+                alert('Неверные данные для входа');
+            }
+        }
+
+        function showAdminPanel() {
+            document.getElementById('deviceCount').value = vrDevices;
+            document.getElementById('currentDevices').textContent = vrDevices;
+            updateBookingsList();
+            updateStatistics();
+            document.getElementById('adminPanel').style.display = 'block';
+        }
+
+        function updateDeviceCount() {
+            const newCount = parseInt(document.getElementById('deviceCount').value);
+            if (newCount >= 1 && newCount <= 20) {
+                vrDevices = newCount;
+                document.getElementById('currentDevices').textContent = vrDevices;
+                // Обновляем список игроков в форме
+                updatePlayerCountOptions();
+                alert('Количество устройств обновлено!');
+            } else {
+                alert('Количество устройств должно быть от 1 до 20');
+            }
+        }
+
+        function updatePlayerCountOptions() {
+            const playerCountSelect = document.getElementById('playerCount');
+            const currentValue = playerCountSelect.value;
+            playerCountSelect.innerHTML = '<option value="">Выберите количество</option>';
+            
+            for (let i = 1; i <= vrDevices; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `${i} ${i === 1 ? 'игрок' : i < 5 ? 'игрока' : 'игроков'}`;
+                playerCountSelect.appendChild(option);
+            }
+            
+            if (currentValue && parseInt(currentValue) <= vrDevices) {
+                playerCountSelect.value = currentValue;
+            }
+        }
+
+        function updateStatistics() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayBookings = bookings.filter(booking => booking.date === today);
+            const todayRevenue = todayBookings.reduce((sum, booking) => sum + booking.price, 0);
+            
+            document.getElementById('totalBookings').textContent = bookings.length;
+            document.getElementById('todayRevenue').textContent = `${todayRevenue} ₽`;
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+
+        function updateBookingsList() {
+            const bookingsList = document.getElementById('bookingsList');
+            bookingsList.innerHTML = '';
+            
+            bookings.forEach(booking => {
+                const bookingDiv = document.createElement('div');
+                bookingDiv.className = 'booking-item';
+                bookingDiv.innerHTML = `
+                    <div>
+                        <strong>${booking.firstName} ${booking.lastName}</strong><br>
+                        ${booking.phone}<br>
+                        ${booking.date} в ${booking.time}<br>
+                        ${booking.duration} мин, ${booking.devicesUsed} ${booking.devicesUsed === 1 ? 'устройство' : 'устройства'}<br>
+                        <strong>Цена: ${booking.price} ₽ (предоплата: ${booking.prepaid} ₽)</strong>
+                    </div>
+                    <div class="booking-actions">
+                        <button class="btn btn-small btn-warning" onclick="editBooking(${booking.id})">Изменить</button>
+                        <button class="btn btn-small btn-danger" onclick="deleteBooking(${booking.id})">Удалить</button>
+                    </div>
+                `;
+                bookingsList.appendChild(bookingDiv);
+            });
+        }
+
+        function deleteBooking(id) {
+            if (confirm('Удалить бронирование?')) {
+                bookings = bookings.filter(booking => booking.id !== id);
+                updateBookingsList();
+                updateStatistics();
+                generateTimeSlots();
+            }
+        }
+
+        function editBooking(id) {
+            alert('Функция редактирования будет реализована в полной версии');
+        }
+
+        // Установка минимальной даты (сегодня)
+        document.getElementById('date').min = new Date().toISOString().split('T')[0];
+        
+        // Инициализация при загрузке страницы
+        updatePlayerCountOptions();
+    </script>
+</body>
+</html>
